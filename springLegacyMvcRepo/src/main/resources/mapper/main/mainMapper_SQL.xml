@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kin.main.service.impl.mainMapper">
+
+	<!-- 전체 내용 조회 -->
+	<select id="search" parameterType="mainVo" resultType="mainVo">
+	  SELECT SEQ, 
+	  		 TITLE, 
+	  		 WRITER, 
+	  		 CONTENT, 
+	  		 TO_CHAR(REGDATE, 'YYYY-MM-DD') AS REGDATE, 
+	  		 CNT
+	  FROM BOARD
+	  WHERE 1=1
+	  <if test="title != null and title != ''">
+	  	AND TITLE LIKE '%'||#{title}||'%'
+	  </if>	
+	  ORDER BY SEQ DESC
+	  <if test="currentPage != null and currentPage != ''">
+	  	OFFSET (#{currentPage}-1)*#{pageSize} ROWS FETCH FIRST #{pageSize} ROWS ONLY
+	  </if>
+	</select>
+	
+	<!-- 검색된 갯수 -->
+	<select id="totalCnt" parameterType="mainVo" resultType="int">
+	  SELECT COUNT(*)
+	  FROM BOARD
+	  WHERE 1=1
+	  <if test="title != null and title != ''">
+	  	AND TITLE LIKE '%'||#{title}||'%'
+	  </if>	
+	</select>
+	
+	<!-- 글 상세 조회 -->
+	<select id="selectDetail" parameterType="int" resultType="mainVo">
+	  SELECT SEQ, 
+	  		 TITLE, 
+	  		 WRITER, 
+	  		 CONTENT, 
+	  		 TO_CHAR(REGDATE, 'YYYY-MM-DD') AS REGDATE, 
+	  		 CNT
+	  FROM BOARD
+	  WHERE SEQ = #{seq}
+	</select>
+	
+	<!-- 글 수정 -->
+	<update id="updateDetail" parameterType="mainVo">
+		UPDATE BOARD
+		SET
+			TITLE = #{title},
+			CONTENT = #{content}
+		WHERE SEQ = #{seq}
+	</update>
+	
+	<!-- 글 삭제 -->
+	<delete id="deleteDetail" parameterType="mainVo">
+		DELETE FROM BOARD WHERE SEQ=#{seq}
+	</delete>
+	
+	<!-- 글등록 -->
+	<insert id="insertDetail" parameterType="mainVo">
+		INSERT INTO BOARD (
+			SEQ, 
+			TITLE, 
+			WRITER, 
+			CONTENT, 
+			REGDATE, 
+			CNT
+		) VALUES (
+			BOARD_SEQ.NEXTVAL, 
+			#{title}, 
+			'임시', 
+			#{content}, 
+			SYSDATE, 
+			0)
+	</insert>
+	
+	<!-- 마지막 글번호 -->
+	<select id="maxSeq" resultType="int">
+	  SELECT MAX(SEQ) FROM BOARD
+	</select>
+
+</mapper>

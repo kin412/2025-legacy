@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="custumAccessDeniedHandler" class="com.kin.securityHandler.custumAccessDeniedHandler"/>
+	<bean id="custumAccessFailHandler" class="com.kin.securityHandler.custumAccessFailHandler"/>
+	<bean id="custumLoginSuccessHandler" class="com.kin.securityHandler.custumLoginSuccessHandler"/>
+	<bean id="custumLogoutSuccessHandler" class="com.kin.securityHandler.custumLogoutSuccessHandler"/>
+	
+	<bean id="custumUserDetailServiceImpl" class="com.kin.member.service.impl.custumUserDetailServiceImpl"/>
+	
+	<!-- use-expressions="false" -> access="ROLE_ADMIN" -->
+	<security:http>
+	
+		<security:intercept-url pattern="/main/main.do" access="hasRole('ROLE_USER')"/>
+		<security:intercept-url pattern="/adminMain/**" access="hasRole('ROLE_ADMIN')"/>
+		<security:intercept-url pattern="/adminFileTest/**" access="hasRole('ROLE_ADMIN')"/>
+		
+		<security:access-denied-handler ref="custumAccessDeniedHandler"/>
+		<!-- <security:access-denied-handler error-page="/error/accessError.do"/> -->
+		
+		<!-- login-processing-url="/app/login" - form의 action과 동일한 값. 근데 둘다 넣으면 안됨? -->
+		<security:form-login 
+			username-parameter="id" 
+			password-parameter="pw"
+			login-page="/login/login.do"
+			authentication-success-handler-ref="custumLoginSuccessHandler"
+			authentication-failure-handler-ref="custumAccessFailHandler"
+		/>
+		
+		<!-- logout-url - form의 action과 동일한 값. 근데 둘다 넣으면 안됨?-->
+		<security:logout
+			logout-success-url="/main/main.do"
+			invalidate-session="true"
+			delete-cookies="JSESSIONID"
+		/>
+		
+		<security:csrf disabled="true"/>
+		
+	</security:http>
+	
+	
+	<!-- custumUserDetailService -->
+	<security:authentication-manager>
+		<security:authentication-provider
+			user-service-ref="custumUserDetailServiceImpl">
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+	<!-- 쿼리를 이용한 인증 -->
+	<!-- 
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service
+				data-source-ref="dataSource"
+				users-by-username-query="SELECT SEQ, USERID, USERPW, ENABLED FROM MEMBER WHERE SEQ = ?"
+				authorities-by-username-query="SELECT SEQ, AUTH FROM MEMBER_AUTH WHERE SEQ = ?"
+			/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	-->
+	
+	<!-- DB연결 안했을때 테스트 -->
+	<!-- 
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:user-service>
+				<security:user name="admin" password="admin" authorities="ROLE_ADMIN, ROLE_USER"/>
+				<security:user name="user" password="user" authorities="ROLE_USER"/>
+			</security:user-service>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	-->
+	
+</beans>
