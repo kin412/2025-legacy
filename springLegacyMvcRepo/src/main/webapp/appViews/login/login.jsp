@@ -172,43 +172,63 @@
 			});
 		}
 		
+		function goOracle(){
+			location.href = "<c:url value='/oracle/index.do'/>";
+		}
+		
 	</script>
+	<style>
+    /* 테이블과 버튼을 감싸는 컨테이너 */
+    .flex-container {
+        display: flex;
+        align-items: flex-start; /* 위쪽 라인에 맞춤 (중앙은 center) */
+        gap: 15px;              /* 테이블과 버튼 사이 간격 */
+    }
+    
+    /* 오라클 버튼 스타일 (선택사항) */
+    .side-btn {
+        height: 100px; /* 테이블 높이에 맞추거나 적절히 조절 */
+        padding: 10px;
+    }
+</style>
 </head>
 <body>
 
 	로그인<br>
-	
-	<table>
-		<tbody>
-			<form action="/app/login" method="post">
-				<!-- <security:csrf disabled="true"/>가 없다면 로그인 처리시 csrf가 있어야함 -->
-				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-				<tr>
-					<td>ID</td>
-					<td><input type="text" id="id" name="id"></td>
-					<td rowspan='2'>
-						<button type="submit" id="submitBtn">로그인</button>
-					</td>
-				</tr>
-				<tr>
-					<td>PW</td>
-					<td><input type="password" id="pw" name="pw"></td>
-					<td>
-						
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<button type="button" onclick="findId()">id 찾기</button>
-					</td>
-					<td colspan='2'>
-						<button type="button" id="findPwBtn">비밀번호 찾기</button>
-						<button type="button" onclick="openPop(1)">회원가입</button>
-					</td>
-				</tr>
-			</form>
-		</tbody>
-	</table>
+	<div class="flex-container">
+		<table>
+			<tbody>
+				<form action="/app/login" method="post">
+					<!-- <security:csrf disabled="true"/>가 없다면 로그인 처리시 csrf가 있어야함 -->
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+					<tr>
+						<td>ID</td>
+						<td><input type="text" id="id" name="id"></td>
+						<td rowspan='2'>
+							<button type="submit" id="submitBtn">로그인</button>
+						</td>
+					</tr>
+					<tr>
+						<td>PW</td>
+						<td><input type="password" id="pw" name="pw"></td>
+						<td>
+							
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button type="button" onclick="findId()">id 찾기</button>
+						</td>
+						<td colspan='2'>
+							<button type="button" id="findPwBtn">비밀번호 찾기</button>
+							<button type="button" onclick="openPop(1)">회원가입</button>
+						</td>
+					</tr>
+				</form>
+			</tbody>
+		</table>
+		<button type="button" class="side-btn" onclick="goOracle()">오라클 ㄱㄱ</button>
+	</div>
 	
 	<!-- 레이어 팝업 -->
 	<div class="popup_layer" id="popup_layer1" style="display: none;">

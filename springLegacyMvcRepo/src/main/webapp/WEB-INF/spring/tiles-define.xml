@@ -22,6 +22,10 @@
         <put-attribute name="content" value=""/>  
     </definition>
     
+    <!-- oracle 제외 -->
+    <definition name="oracle/*" template="/appViews/oracle/{1}.jsp">
+    </definition>
+    
     
     <!--  -->
     
@@ -34,6 +38,8 @@
 	<definition name="login/*" extends="empty">
         <put-attribute name="content" value="/appViews/login/{1}.jsp"/>  
     </definition>
+    
+    
 	
 	<!-- main layout -->
 	<definition name="*/*" extends="layout-tiles">

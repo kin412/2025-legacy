@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kin.oracle.service.impl.oracleMapper">
+
+	<!-- 전체 내용 조회 -->
+	<select id="search" parameterType="mainVo" resultType="mainVo">
+	  SELECT SEQ, 
+	  		 TITLE, 
+	  		 WRITER, 
+	  		 CONTENT, 
+	  		 TO_CHAR(REGDATE, 'YYYY-MM-DD') AS REGDATE, 
+	  		 CNT
+	  FROM BOARD
+	  WHERE 1=1
+	  <if test="title != null and title != ''">
+	  	AND TITLE LIKE '%'||#{title}||'%'
+	  </if>	
+	  ORDER BY SEQ DESC
+	  <if test="currentPage != null and currentPage != ''">
+	  	OFFSET (#{currentPage}-1)*#{pageSize} ROWS FETCH FIRST #{pageSize} ROWS ONLY
+	  </if>
+	</select>
+	
+	<!-- 검색된 갯수 -->
+	<select id="totalCnt" parameterType="mainVo" resultType="int">
+	  SELECT COUNT(*)
+	  FROM BOARD
+	  WHERE 1=1
+	  <if test="title != null and title != ''">
+	  	AND TITLE LIKE '%'||#{title}||'%'
+	  </if>	
+	</select>
+	
+	<!-- 글 상세 조회 -->
+	<select id="selectDetail" parameterType="int" resultType="mainVo">
+	  SELECT SEQ, 
+	  		 TITLE, 
+	  		 WRITER, 
+	  		 CONTENT, 
+	  		 TO_CHAR(REGDATE, 'YYYY-MM-DD') AS REGDATE, 
+	  		 CNT
+	  FROM BOARD
+	  WHERE SEQ = #{seq}
+	</select>
+	
+	<!-- 글 수정 -->
+	<update id="updateDetail" parameterType="mainVo">
+		UPDATE BOARD
+		SET
+			TITLE = #{title},
+			CONTENT = #{content}
+		WHERE SEQ = #{seq}
+	</update>
+	
+	<!-- 글 삭제 -->
+	<delete id="deleteDetail" parameterType="mainVo">
+		DELETE FROM BOARD WHERE SEQ=#{seq}
+	</delete>
+	
+	<!-- 글등록 -->
+	<insert id="insertTest" parameterType="oracleVo">
+		INSERT INTO BOARD (
+			SEQ, 
+			TITLE, 
+			WRITER, 
+			CONTENT, 
+			REGDATE, 
+			CNT
+		) VALUES (
+			BOARD_SEQ.NEXTVAL, 
+			#{title}, 
+			'oracle', 
+			#{content}, 
+			SYSDATE, 
+			0)
+	</insert>
+	
+	<!-- 마지막 글번호 -->
+	<select id="maxSeq" resultType="int">
+	  SELECT MAX(SEQ) FROM BOARD
+	</select>
+	
+	<!-- CALL PROCEDURE -->
+	<!-- return type은 select만 가능. insert,update는 parameterType 명시 시 리턴타입도 통일됨. -->
+	<!-- 프로시저에서 returning 하는 순서 대로 아래 out에 매칭됨. 변수명으로 매칭되는게 아님. -->
+	<!-- 받아오는 xml 변수명과 vo변수명만 일치시키면됨. -->
+	<!-- mapper 인터페이스의 반환형이 일반 db에 대한건 xml의 returntype과 맞춰줘야 하지만 프로시저의 경우는 mapper 인터페이스의 반환형을 void로 한다. -->
+	<!-- 프로시저는 그것도 parameterType 이게 알아서 처리한다. -->
+	<insert id="procedureTest" parameterType="oracleVo" statementType="CALLABLE">
+	    { CALL PROC_INSERT_TEST(
+	        #{title,   mode=IN,  jdbcType=VARCHAR},
+	        #{content, mode=IN,  jdbcType=VARCHAR},
+	        #{outSeq,  mode=OUT, jdbcType=INTEGER},
+	        #{outTitle,mode=OUT, jdbcType=VARCHAR},
+	        #{outWriter,mode=OUT, jdbcType=VARCHAR},
+	        #{outContent,mode=OUT, jdbcType=VARCHAR},
+	        #{outRegdate, mode=OUT, jdbcType=DATE},
+	        #{outCnt,  mode=OUT, jdbcType=INTEGER}
+	    ) }
+	</insert>
+	
+	<!-- Anonymous Block ex -->
+	<update id="callAnonymousProc" parameterType="hashmap" statementType="CALLABLE">
+	    BEGIN
+	        PROC_INSERT_TEST(
+	            #{title,   mode=IN,  jdbcType=VARCHAR},
+	            #{content, mode=IN,  jdbcType=VARCHAR},
+	            #{outSeq,  mode=OUT, jdbcType=INTEGER}
+	        );
+	        <!-- 위와 같이써도 되지만 보통 익명 블록은 이안에 프로시저의 내용이 오는 경우가 대부분 -->
+	    END;
+	</update>
+
+</mapper>

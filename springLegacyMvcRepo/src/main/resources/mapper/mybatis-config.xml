@@ -8,6 +8,7 @@
 		<typeAlias alias="authVo" type="com.kin.member.service.authVo"/>
 		<typeAlias alias="adminFileTestVo" type="com.kin.adminFileTest.service.adminFileTestVo"/>
 		<typeAlias alias="menuVo" type="com.kin.menu.service.menuVo"/>
+		<typeAlias alias="oracleVo" type="com.kin.oracle.service.oracleVo"/>
 		
 	</typeAliases>
 </configuration>
